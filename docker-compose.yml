@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend-client
+      - frontend-backoffice
+    networks:
+      - mut-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    networks:
+      - mut-network
+
+  frontend-client:
+    build:
+      context: ./frontend-client
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    volumes:
+      - ./frontend-client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - mut-network
+
+  frontend-backoffice:
+    build:
+      context: ./frontend-backoffice
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    volumes:
+      - ./frontend-backoffice:/app
+      - /app/node_modules
+    ports:
+      - "5174:5174"
+    networks:
+      - mut-network
+
+networks:
+  mut-network:
+    driver: bridge
