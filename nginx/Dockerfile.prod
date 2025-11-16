@@ -1,0 +1,14 @@
+# Use Nginx Alpine base image
+FROM nginx:alpine
+
+# Install wget for health checks
+RUN apk add --no-cache wget
+
+# Copy production Nginx configuration
+COPY nginx.prod.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
